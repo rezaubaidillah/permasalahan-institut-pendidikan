@@ -39,3 +39,7 @@ typing_extensions==4.13.2
 tzdata==2025.2
 urllib3==2.4.0
 watchdog==6.0.0
+imbalanced_learn==0.13.0
+matplotlib==3.10.3
+scikit_learn==1.6.1
+seaborn==0.13.2
