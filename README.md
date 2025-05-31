@@ -37,7 +37,14 @@ Data yang digunakan berasal dari [https://github.com/dicodingacademy/dicoding_da
      - Password: `root123`
 
 ## Business Dashboard
-Business dashboard yang telah dibuat dapat dilihat pada file `dashboard.pdf` yang telah diberikan. Dashboard ini menyajikan visualisasi data seperti jumlah siswa berdasarkan status (Dropout, Enrolled, Graduate), persentase kelulusan, dropout, dan enrolled, serta distribusi berdasarkan beasiswa dan gender. Dashboard ini membantu Jaya Jaya Institut memahami distribusi siswa dan tren dropout secara visual.
+Business dashboard yang telah dibuat menyajikan visualisasi data mahasiswa Jaya Jaya Institut untuk mendukung analisis tingkat dropout dan strategi retensi. Dashboard ini mencakup:  
+- **Komposisi Mahasiswa**: Total 4,424 mahasiswa, dengan 110 mahasiswa internasional (2,5%) dan 4,314 mahasiswa lokal (97,5%).  
+- **Distribusi Status Mahasiswa**: 49,9% lulus (Graduate), 32,1% dropout, dan 17,9% masih terdaftar (Enrolled), menyoroti tingkat dropout yang signifikan.  
+- **Performa Akademik**: Grafik batang menampilkan hubungan antara jumlah unit kurikuler semester kedua yang disetujui (0-20) dengan status mahasiswa (Dropout, Enrolled, Graduate). Mahasiswa dengan lebih banyak unit yang disetujui cenderung lulus, sementara yang lebih sedikit berisiko dropout.  
+- **Komposisi Gender**: 64,8% perempuan dan 35,2% laki-laki, memberikan gambaran demografi mahasiswa.  
+- **Beasiswa**: Menyajikan data terkait beasiswa (total 4,424 mahasiswa), meskipun detail persentase belum lengkap.  
+Dashboard ini membantu mengidentifikasi pola risiko dropout berdasarkan performa akademik dan demografi, mendukung pengambilan keputusan untuk intervensi dini seperti bimbingan akademik atau perluasan beasiswa.
+
 
 ## Menjalankan Sistem Machine Learning
 Prototype sistem machine learning yang telah dibuat dapat dijalankan dengan langkah berikut:  
