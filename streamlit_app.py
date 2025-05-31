@@ -5,10 +5,10 @@ import joblib
 from sklearn.preprocessing import StandardScaler
 import os
 
-# Set a custom theme for the app
+# Konfigurasi halaman Streamlit
 st.set_page_config(page_title="Jaya Jaya Institut Pendidikan Prediksi", layout="wide", initial_sidebar_state="collapsed")
 
-# Custom CSS for better styling
+# CSS kustom untuk styling
 st.markdown("""
     <style>
     .main {
@@ -24,56 +24,49 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Function to load and cache the dataset
+# Fungsi untuk memuat dataset
 @st.cache_data
-def load_data():
+def load_student_data():
     if not os.path.exists('student_feature_corr.csv'):
-        st.error("Dataset file 'student_feature_corr.csv' not found. Please ensure the file is in the correct directory.")
+        st.error("File dataset 'student_feature_corr.csv' tidak ditemukan.")
         st.stop()
     data = pd.read_csv('student_feature_corr.csv')
     data = data.drop(columns=['Status'], axis=1)
     return data
 
-# Function for data preprocessing
-def data_preprocessing(data_input, single_data, n, scaler):
-    data = load_data()
-    data = pd.concat([data_input, data])
-    data = scaler.transform(data)
-    if single_data:
-        return data[[n]]
-    else:
-        return data[0:n]
+# Fungsi untuk preprocessing data
+def transform_input_data(input_data, scaler):
+    return scaler.transform(input_data)
 
-# Function to load the model
-def load_model():
+# Fungsi untuk memuat model
+def get_prediction_model():
     if not os.path.exists('model/model.joblib'):
-        st.error("Model file 'model.joblib' not found. Please ensure the model is trained and saved in the 'model' directory.")
+        st.error("File model 'model.joblib' tidak ditemukan.")
         st.stop()
     return joblib.load('model/model.joblib')
 
-# Function to make predictions
-def model_predict(data, model):
+# Fungsi untuk membuat prediksi
+def make_prediction(data, model):
     return model.predict(data)
 
-# Function to display prediction result
-def display_prediction(output):
+# Fungsi untuk menampilkan hasil prediksi
+def show_prediction_result(output):
     if output == 1:
-        st.balloons()
-        st.success('🎉 **Graduate**', icon="✅")
-        st.markdown("The model predicts this student is likely to **graduate**.")
+        st.markdown("<h3 style='color: green;'>🎉 Lulus</h3>", unsafe_allow_html=True)
+        st.markdown("Model memprediksi siswa ini kemungkinan akan **lulus**.")
     else:
-        st.error('⚠️ **Dropout**', icon="❌")
-        st.markdown("The model predicts this student is at risk of **dropping out**.")
+        st.markdown("<h3 style='color: red;'>⚠️ Putus Sekolah</h3>", unsafe_allow_html=True)
+        st.markdown("Model memprediksi siswa ini berisiko **putus sekolah**.")
 
 def main():
     st.title('Jaya Jaya Institut Pendidikan Prediksi')
 
-    # Mappings for categorical inputs
-    gender_mapping = {'Male': 1, 'Female': 0}
-    marital_status_mapping = {
+    # Pemetaan untuk input kategorikal
+    gender_map = {'Male': 1, 'Female': 0}
+    marital_map = {
         'Single': 1, 'Married': 2, 'Widower': 3, 'Divorced': 4, 'Facto Union': 5, 'Legally Seperated': 6
     }
-    application_mapping = {
+    application_map = {
         '1st Phase - General Contingent': 1,
         '1st Phase - Special Contingent (Azores Island)': 5,
         '1st Phase - Special Contingent (Madeira Island)': 16,
@@ -94,153 +87,112 @@ def main():
         'Change of Institution/Course (International)': 57,
     }
 
-    # Input fields for single data
+    # Input pengguna
     with st.container():
-        col_gender, col_age, col_marital = st.columns([2, 2, 3])
-        with col_gender:
-            gender = st.radio('Gender', options=['Male', 'Female'],
-                              help='The gender of the student')
-        with col_age:
-            age = st.number_input('Age at Enrollment', min_value=17, max_value=70, step=1,
-                                  help='The age of the student at the time of enrollment')
-        with col_marital:
-            marital_status = st.selectbox('Marital Status', ('Single', 'Married',
-                                                            'Widower', 'Divorced', 'Facto Union', 'Legally Seperated'),
-                                          help='The marital status of the student')
+        col1, col2, col3 = st.columns([2, 2, 3])
+        with col1:
+            gender = st.radio('Jenis Kelamin', options=['Male', 'Female'], help='Jenis kelamin siswa')
+        with col2:
+            age = st.number_input('Usia saat Mendaftar', min_value=17, max_value=70, step=1, help='Usia siswa saat mendaftar')
+        with col3:
+            marital_status = st.selectbox('Status Perkawinan', ('Single', 'Married', 'Widower', 'Divorced', 'Facto Union', 'Legally Seperated'), help='Status perkawinan siswa')
 
     st.write('')
-    st.write('')
-
     with st.container():
-        col_application, col_prev_grade, col_admission_grade = st.columns([3, 1.65, 1.1])
-        with col_application:
-            application_mode = st.selectbox('Application Mode', (
-                '1st Phase - General Contingent',
-                '1st Phase - Special Contingent (Azores Island)',
-                '1st Phase - Special Contingent (Madeira Island)',
-                '2nd Phase - General Contingent', '3rd Phase - General Contingent',
-                'Ordinance No. 612/93', 'Ordinance No. 854-B/99',
-                'Ordinance No. 533-A/99, Item B2 (Different Plan)',
-                'Ordinance No. 533-A/99, Item B3 (Other Institution)',
-                'International Student (Bachelor)', 'Over 23 Years Old',
-                'Transfer', 'Change of Course', 'Holders of Other Higher Courses',
-                'Short Cycle Diploma Holders',
-                'Technological Specialization Diploma Holders',
-                'Change of Institution/Course',
-                'Change of Institution/Course (International)'),
-                help='The method of application used by the student')
-        with col_prev_grade:
-            prev_qualification_grade = st.number_input('Previous Qualification Grade', min_value=0, max_value=200, step=1,
-                                                      help='Grade of previous qualification (0-200)')
-        with col_admission_grade:
-            admission_grade = st.number_input('Admission Grade', min_value=0, max_value=200, step=1,
-                                             help="Student's admission grade (0-200)")
-
-    with st.container():
-        col_scholarship, col_tuition, col_displaced, col_debtor = st.columns([1.7, 2.1, 1.55, 1])
-        with col_scholarship:
-            scholarship_holder = 1 if st.checkbox(
-                'Scholarship', help='Whether the student is a scholarship holder') else 0
-        with col_tuition:
-            tuition_fees = 1 if st.checkbox(
-                'Tuition up to date', help="Whether the student's tuition fees are up to date") else 0
-        with col_displaced:
-            displaced = 1 if st.checkbox(
-                'Displaced', help='Whether the student is a displaced person') else 0
-        with col_debtor:
-            debtor = 1 if st.checkbox(
-                'Debtor', help='Whether the student is a debtor') else 0
+        col4, col5, col6 = st.columns([3, 1.65, 1.1])
+        with col4:
+            application_mode = st.selectbox('Mode Aplikasi', list(application_map.keys()), help='Metode aplikasi siswa')
+        with col5:
+            prev_qualification_grade = st.number_input('Nilai Kualifikasi Sebelumnya', min_value=0, max_value=200, step=1, help='Nilai kualifikasi sebelumnya (0-200)')
+        with col6:
+            admission_grade = st.number_input('Nilai Penerimaan', min_value=0, max_value=200, step=1, help='Nilai penerimaan siswa (0-200)')
 
     st.write('')
-    st.write('')
-
     with st.container():
-        col_1_enroll, col_2_enroll, col_2_eval = st.columns([1, 1, 1.2])
-        with col_1_enroll:
-            curricular_units_1st_sem_enrolled = st.number_input(
-                'Units 1st Semester Enrolled', min_value=0, max_value=26, step=1,
-                help='The number of curricular units enrolled by the student in the first semester')
-        with col_2_enroll:
-            curricular_units_2nd_sem_enrolled = st.number_input(
-                'Units 2nd Semester Enrolled', min_value=0, max_value=23, step=1,
-                help='The number of curricular units enrolled by the student in the second semester')
-        with col_2_eval:
-            curricular_units_2nd_sem_evaluations = st.number_input(
-                'Units 2nd Semester Evaluations', min_value=0, max_value=33, step=1,
-                help='The number of curricular units evaluations by the student in the second semester')
-
-    with st.container():
-        col_1_approved, col_2_approved, col_2_noeval = st.columns([1, 1, 1.2])
-        with col_1_approved:
-            curricular_units_1st_sem_approved = st.number_input(
-                'Units 1st Semester Approved', min_value=0, max_value=26, step=1,
-                help='The number of curricular units approved by the student in the first semester')
-        with col_2_approved:
-            curricular_units_2nd_sem_approved = st.number_input(
-                'Units 2nd Semester Approved', min_value=0, max_value=20, step=1,
-                help='The number of curricular units approved by the student in the second semester')
-        with col_2_noeval:
-            curricular_units_2nd_sem_without_evaluations = st.number_input(
-                'Units 2nd Semester No Evaluations', min_value=0, max_value=12, step=1,
-                help='The number of curricular units without evaluations by the student in the second semester')
-
-    with st.container():
-        col_1_grade, col_2_grade, col_2_empty = st.columns([1, 1, 1.2])
-        with col_1_grade:
-            curricular_units_1st_sem_grade = st.number_input(
-                'Units 1st Semester Grade', min_value=0, max_value=20, step=1,
-                help='The number of curricular units grade by the student in the first semester')
-        with col_2_grade:
-            curricular_units_2nd_sem_grade = st.number_input(
-                'Units 2nd Semester Grade', min_value=0, max_value=20, step=1,
-                help='The number of curricular units grade by the student in the second semester')
-
-    # Mapping the categorical data
-    gender = gender_mapping.get(gender)
-    marital_status = marital_status_mapping.get(marital_status)
-    application_mode = application_mapping.get(application_mode)
-
-    # Create DataFrame for input data
-    data = [[marital_status, application_mode, prev_qualification_grade,
-             admission_grade, displaced, debtor, tuition_fees,
-             gender, scholarship_holder, age,
-             curricular_units_1st_sem_enrolled,
-             curricular_units_1st_sem_approved, curricular_units_1st_sem_grade,
-             curricular_units_2nd_sem_enrolled,
-             curricular_units_2nd_sem_evaluations,
-             curricular_units_2nd_sem_approved, curricular_units_2nd_sem_grade,
-             curricular_units_2nd_sem_without_evaluations]]
-
-    data = pd.DataFrame(data, columns=[
-        'Marital_status', 'Application_mode', 'Previous_qualification_grade',
-        'Admission_grade', 'Displaced', 'Debtor', 'Tuition_fees_up_to_date',
-        'Gender', 'Scholarship_holder', 'Age_at_enrollment',
-        'Curricular_units_1st_sem_enrolled',
-        'Curricular_units_1st_sem_approved', 'Curricular_units_1st_sem_grade',
-        'Curricular_units_2nd_sem_enrolled',
-        'Curricular_units_2nd_sem_evaluations',
-        'Curricular_units_2nd_sem_approved', 'Curricular_units_2nd_sem_grade',
-        'Curricular_units_2nd_sem_without_evaluations'])
-
-    # Load the scaler and model
-    scaler = StandardScaler().fit(load_data())
-    model = load_model()
-
-    # Predict button
-    st.markdown("### Predict")
-    if st.button(' Predict Student Status', use_container_width=True):
-        data_input = data_preprocessing(data, True, 0, scaler)
-        output = model_predict(data_input, model)
-        display_prediction(output)
+        col7, col8, col9, col10 = st.columns([1.7, 2.1, 1.55, 1])
+        with col7:
+            scholarship_holder = 1 if st.checkbox('Pemegang Beasiswa', help='Apakah siswa pemegang beasiswa') else 0
+        with col8:
+            tuition_fees = 1 if st.checkbox('Biaya Kuliah Terbaru', help='Apakah biaya kuliah siswa terbaru') else 0
+        with col9:
+            displaced = 1 if st.checkbox('Terdispersi', help='Apakah siswa terdispersi') else 0
+        with col10:
+            debtor = 1 if st.checkbox('Berutang', help='Apakah siswa berutang') else 0
 
     st.write('')
-    st.write('')
+    with st.container():
+        col11, col12, col13 = st.columns([1, 1, 1.2])
+        with col11:
+            curricular_units_1st_sem_enrolled = st.number_input('Unit Semester 1 Terdaftar', min_value=0, max_value=26, step=1, help='Jumlah unit terdaftar semester 1')
+        with col12:
+            curricular_units_2nd_sem_enrolled = st.number_input('Unit Semester 2 Terdaftar', min_value=0, max_value=23, step=1, help='Jumlah unit terdaftar semester 2')
+        with col13:
+            curricular_units_2nd_sem_evaluations = st.number_input('Evaluasi Semester 2', min_value=0, max_value=33, step=1, help='Jumlah evaluasi semester 2')
 
+    st.write('')
+    with st.container():
+        col14, col15, col16 = st.columns([1, 1, 1.2])
+        with col14:
+            curricular_units_1st_sem_approved = st.number_input('Unit Semester 1 Disetujui', min_value=0, max_value=26, step=1, help='Jumlah unit disetujui semester 1')
+        with col15:
+            curricular_units_2nd_sem_approved = st.number_input('Unit Semester 2 Disetujui', min_value=0, max_value=20, step=1, help='Jumlah unit disetujui semester 2')
+        with col16:
+            curricular_units_2nd_sem_without_evaluations = st.number_input('Unit Semester 2 Tanpa Evaluasi', min_value=0, max_value=12, step=1, help='Jumlah unit tanpa evaluasi semester 2')
+
+    st.write('')
+    with st.container():
+        col17, col18, col19 = st.columns([1, 1, 1.2])
+        with col17:
+            curricular_units_1st_sem_grade = st.number_input('Nilai Semester 1', min_value=0, max_value=20, step=1, help='Nilai unit semester 1')
+        with col18:
+            curricular_units_2nd_sem_grade = st.number_input('Nilai Semester 2', min_value=0, max_value=20, step=1, help='Nilai unit semester 2')
+
+    # Memetakan data kategorikal
+    gender = gender_map.get(gender)
+    marital_status = marital_map.get(marital_status)
+    application_mode = application_map.get(application_mode)
+
+    # Membuat DataFrame untuk input
+    input_data = pd.DataFrame([{
+        'Marital_status': marital_status,
+        'Application_mode': application_mode,
+        'Previous_qualification_grade': prev_qualification_grade,
+        'Admission_grade': admission_grade,
+        'Displaced': displaced,
+        'Debtor': debtor,
+        'Tuition_fees_up_to_date': tuition_fees,
+        'Gender': gender,
+        'Scholarship_holder': scholarship_holder,
+        'Age_at_enrollment': age,
+        'Curricular_units_1st_sem_enrolled': curricular_units_1st_sem_enrolled,
+        'Curricular_units_1st_sem_approved': curricular_units_1st_sem_approved,
+        'Curricular_units_1st_sem_grade': curricular_units_1st_sem_grade,
+        'Curricular_units_2nd_sem_enrolled': curricular_units_2nd_sem_enrolled,
+        'Curricular_units_2nd_sem_evaluations': curricular_units_2nd_sem_evaluations,
+        'Curricular_units_2nd_sem_approved': curricular_units_2nd_sem_approved,
+        'Curricular_units_2nd_sem_grade': curricular_units_2nd_sem_grade,
+        'Curricular_units_2nd_sem_without_evaluations': curricular_units_2nd_sem_without_evaluations
+    }])
+
+    # Memuat dataset dan scaler
+    dataset = load_student_data()
+    scaler = StandardScaler().fit(dataset)
+
+    # Memuat model
+    model = get_prediction_model()
+
+    # Tombol prediksi
+    st.markdown("### Prediksi")
+    if st.button('Prediksi Status Siswa', use_container_width=True):
+        transformed_data = transform_input_data(input_data, scaler)
+        prediction = make_prediction(transformed_data, model)
+        show_prediction_result(prediction[0])
+
+    st.write('')
     year_now = datetime.date.today().year
     year = year_now if year_now == 2025 else f'2025 - {year_now}'
-    name = "[Muhammad Reza Ubaidillah](https://www.linkedin.com/in/muhammadrezaubaidillah/ 'Muhammad Reza Ubaidillah | LinkedIn')"
-    copyright = 'Copyright © ' + str(year) + ' ' + name
-    st.caption(copyright)
+    name = "[Muhammad Reza Ubaidillah](https://www.linkedin.com/in/muhammadrezaubaidillah/)"
+    st.markdown(f"**Copyright © {year} {name}**", unsafe_allow_html=True)
 
 if __name__ == '__main__':
     main()
