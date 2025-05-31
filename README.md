@@ -15,7 +15,7 @@ Cakupan proyek yang akan dikerjakan meliputi:
 ### Persiapan
 
 **Sumber Data:**  
-Data yang digunakan berasal dari [https://github.com/dicodingacademy/dicoding_dataset/blob/main/students_performance/README.md](https://github.com/dicodingacademy/dicoding_dataset/blob/main/students_performance/README.md).
+Data yang digunakan berasal dari [dataset](https://github.com/dicodingacademy/dicoding_dataset/blob/main/students_performance/README.md).
 
 **Setup Environment:**  
 1. Clone repository berikut:  
@@ -52,10 +52,8 @@ Prototype sistem machine learning yang telah dibuat dapat dijalankan dengan lang
   ```
   streamlit run streamlit_app.py
   ```
-  - atau gunakan link berikut : [https://github.com/dicodingacademy/dicoding_dataset/blob/main/students_performance/README.md](https://permasalahan-institut-pendidikan.streamlit.app/).
-  ```
-  streamlit run streamlit_app.py
-  ```  
+  - atau gunakan link berikut : [link](https://permasalahan-institut-pendidikan.streamlit.app/).
+  
 Sistem ini memungkinkan prediksi apakah seorang siswa berisiko dropout berdasarkan fitur-fitur yang telah diidentifikasi.
 
 ## Conclusion
