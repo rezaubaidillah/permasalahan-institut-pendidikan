@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 import os
 
 # Konfigurasi halaman Streamlit
-st.set_page_config(page_title="Jaya Jaya Institut Pendidikan Prediksi", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Jaya Jaya Institut Pendidikan, Prediksi Dropout", layout="wide", initial_sidebar_state="collapsed")
 
 # CSS kustom untuk styling
 st.markdown("""
