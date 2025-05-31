@@ -79,7 +79,5 @@ Berikut adalah rekomendasi tindakan yang dapat dilakukan Jaya Jaya Institut untu
 - **Monitoring dan Intervensi Dini:**  
   - Menggunakan model machine learning untuk mengidentifikasi siswa berisiko secara dini.  
   - Memberikan intervensi khusus seperti bimbingan akademik atau konseling.  
-- **Meningkatkan Akses ke Sumber Daya:**  
-  - Menyediakan akses ke perpustakaan, laboratorium, dan fasilitas pendukung lainnya.  
 - **Meningkatkan Komunikasi:**  
   - Meningkatkan komunikasi antara siswa, dosen, dan staf untuk memastikan siswa merasa didukung.
