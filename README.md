@@ -51,6 +51,10 @@ Prototype sistem machine learning yang telah dibuat dapat dijalankan dengan lang
 - Jalankan aplikasi Streamlit menggunakan perintah:  
   ```
   streamlit run streamlit_app.py
+  ```
+  - atau gunakan link berikut : [https://github.com/dicodingacademy/dicoding_dataset/blob/main/students_performance/README.md](https://permasalahan-institut-pendidikan.streamlit.app/).
+  ```
+  streamlit run streamlit_app.py
   ```  
 Sistem ini memungkinkan prediksi apakah seorang siswa berisiko dropout berdasarkan fitur-fitur yang telah diidentifikasi.
 
